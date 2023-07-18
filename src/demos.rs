@@ -1,120 +1,119 @@
 use std::f64::consts::PI;
 
-pub fn cube(fr: f64) -> Vec<Vec<Vec<(f64, f64, f64)>>> {
-    let y = -0.25;
-    let radius: f64 = 0.5;
+pub fn rotating_cube(pos: (f64, f64, f64), size: f64, fr: f64) -> Vec<Vec<Vec<(f64, f64, f64)>>> {
+    let elevation = pos.1 + (2.0 * size * 0.7) ;
     vec![
         vec![vec![
-            (fr.cos() * radius, radius, 2.0 + fr.sin() * radius),
+            (pos.0 + fr.cos() * size, elevation, pos.2 + fr.sin() * size),
             (
-                (fr + (PI / 2.0)).cos() * radius,
-                radius,
-                2.0 + (fr + (PI / 2.0)).sin() * radius,
+              pos.0 + (fr + (PI / 2.0)).cos() * size,
+                 elevation,
+                pos.2 + (fr + (PI / 2.0)).sin() * size,
             ),
-            (-fr.cos() * radius, radius, 2.0 + -fr.sin() * radius),
+            (pos.0 - fr.cos() * size, elevation, pos.2 + -fr.sin() * size),
         ]],
         vec![vec![
-            (fr.cos() * radius, y, 2.0 + fr.sin() * radius),
+            (pos.0 + fr.cos() * size, pos.1, pos.2 + fr.sin() * size),
             (
-                (fr + (PI / 2.0)).cos() * radius,
-                y,
-                2.0 + (fr + (PI / 2.0)).sin() * radius,
+              pos.0 + (fr + (PI / 2.0)).cos() * size,
+                pos.1,
+                pos.2 + (fr + (PI / 2.0)).sin() * size,
             ),
-            (-fr.cos() * radius, y, 2.0 + -fr.sin() * radius),
+            (pos.0 - fr.cos() * size, pos.1, pos.2 + -fr.sin() * size),
         ]],
         vec![
             vec![
-                (fr.cos() * radius, y, 2.0 + fr.sin() * radius),
-                (fr.cos() * radius, radius, 2.0 + fr.sin() * radius),
+                (pos.0 + fr.cos() * size, pos.1, pos.2 + fr.sin() * size),
+                (pos.0 + fr.cos() * size, elevation, pos.2 + fr.sin() * size),
                 (
-                    (fr + (PI / 2.0)).cos() * radius,
-                    radius,
-                    (fr + (PI / 2.0)).sin() * radius + 2.0,
+                  pos.0 + (fr + (PI / 2.0)).cos() * size,
+                     elevation,
+                    pos.2 + (fr + (PI / 2.0)).sin() * size,
                 ),
             ],
             vec![
-                (fr.cos() * radius, y, 2.0 + fr.sin() * radius),
+                (pos.0 + fr.cos() * size, pos.1, pos.2 + fr.sin() * size),
                 (
-                    (fr + (PI / 2.0)).cos() * radius,
-                    y,
-                    2.0 + (fr + (PI / 2.0)).sin() * radius,
+                  pos.0 + (fr + (PI / 2.0)).cos() * size,
+                    pos.1,
+                    pos.2 + (fr + (PI / 2.0)).sin() * size,
                 ),
                 (
-                    (fr + (PI / 2.0)).cos() * radius,
-                    radius,
-                    (fr + (PI / 2.0)).sin() * radius + 2.0,
-                ),
-            ],
-        ],
-        vec![
-            vec![
-                (-fr.cos() * radius, y, 2.0 + -fr.sin() * radius),
-                (-fr.cos() * radius, radius, 2.0 + -fr.sin() * radius),
-                (
-                    -(fr + (PI / 2.0)).cos() * radius,
-                    radius,
-                    -(fr + (PI / 2.0)).sin() * radius + 2.0,
-                ),
-            ],
-            vec![
-                (-fr.cos() * radius, y, 2.0 + -fr.sin() * radius),
-                (
-                    -(fr + (PI / 2.0)).cos() * radius,
-                    y,
-                    2.0 + -(fr + (PI / 2.0)).sin() * radius,
-                ),
-                (
-                    -(fr + (PI / 2.0)).cos() * radius,
-                    radius,
-                    -(fr + (PI / 2.0)).sin() * radius + 2.0,
+                  pos.0 + (fr + (PI / 2.0)).cos() * size,
+                     elevation,
+                    pos.2 + (fr + (PI / 2.0)).sin() * size,
                 ),
             ],
         ],
         vec![
             vec![
-                (fr.cos() * radius, y, 2.0 + fr.sin() * radius),
-                (fr.cos() * radius, radius, 2.0 + fr.sin() * radius),
+                (pos.0 - fr.cos() * size, pos.1, pos.2 + -fr.sin() * size),
+                (pos.0 - fr.cos() * size, elevation, pos.2 + -fr.sin() * size),
                 (
-                    (fr + (PI * 1.5)).cos() * radius,
-                    radius,
-                    (fr + (PI * 1.5)).sin() * radius + 2.0,
+                  pos.0 - (fr + (PI / 2.0)).cos() * size,
+                     elevation,
+                    pos.2 + -(fr + (PI / 2.0)).sin() * size,
                 ),
             ],
             vec![
-                (fr.cos() * radius, y, 2.0 + fr.sin() * radius),
+                (pos.0 - fr.cos() * size, pos.1, pos.2 + -fr.sin() * size),
                 (
-                    (fr + (PI * 1.5)).cos() * radius,
-                    y,
-                    2.0 + (fr + (PI * 1.5)).sin() * radius,
+                  pos.0 - (fr + (PI / 2.0)).cos() * size,
+                    pos.1,
+                    pos.2 + -(fr + (PI / 2.0)).sin() * size,
                 ),
                 (
-                    (fr + (PI * 1.5)).cos() * radius,
-                    radius,
-                    (fr + (PI * 1.5)).sin() * radius + 2.0,
+                  pos.0 - (fr + (PI / 2.0)).cos() * size,
+                     elevation,
+                    pos.2 + -(fr + (PI / 2.0)).sin() * size,
                 ),
             ],
         ],
         vec![
             vec![
-                (-fr.cos() * radius, y, 2.0 + -fr.sin() * radius),
-                (-fr.cos() * radius, radius, 2.0 + -fr.sin() * radius),
+                (pos.0 + fr.cos() * size, pos.1, pos.2 + fr.sin() * size),
+                (pos.0 + fr.cos() * size, elevation, pos.2 + fr.sin() * size),
                 (
-                    -(fr + (PI * 1.5)).cos() * radius,
-                    radius,
-                    -(fr + (PI * 1.5)).sin() * radius + 2.0,
+                  pos.0 + (fr + (PI * 1.5)).cos() * size,
+                     elevation,
+                    pos.2 + (fr + (PI * 1.5)).sin() * size,
                 ),
             ],
             vec![
-                (-fr.cos() * radius, y, 2.0 + -fr.sin() * radius),
+                (pos.0 + fr.cos() * size, pos.1, pos.2 + fr.sin() * size),
                 (
-                    -(fr + (PI * 1.5)).cos() * radius,
-                    y,
-                    2.0 + -(fr + (PI * 1.5)).sin() * radius,
+                  pos.0 + (fr + (PI * 1.5)).cos() * size,
+                    pos.1,
+                    pos.2 + (fr + (PI * 1.5)).sin() * size,
                 ),
                 (
-                    -(fr + (PI * 1.5)).cos() * radius,
-                    radius,
-                    -(fr + (PI * 1.5)).sin() * radius + 2.0,
+                  pos.0 + (fr + (PI * 1.5)).cos() * size,
+                     elevation,
+                    pos.2 + (fr + (PI * 1.5)).sin() * size,
+                ),
+            ],
+        ],
+        vec![
+            vec![
+                (pos.0 - fr.cos() * size, pos.1, pos.2 + -fr.sin() * size),
+                (pos.0 - fr.cos() * size, elevation, pos.2 + -fr.sin() * size),
+                (
+                  pos.0 - (fr + (PI * 1.5)).cos() * size,
+                     elevation,
+                    pos.2 + -(fr + (PI * 1.5)).sin() * size,
+                ),
+            ],
+            vec![
+                (pos.0 - fr.cos() * size, pos.1, pos.2 + -fr.sin() * size),
+                (
+                  pos.0 - (fr + (PI * 1.5)).cos() * size,
+                    pos.1,
+                    pos.2 + -(fr + (PI * 1.5)).sin() * size,
+                ),
+                (
+                  pos.0 - (fr + (PI * 1.5)).cos() * size,
+                     elevation,
+                    pos.2 + -(fr + (PI * 1.5)).sin() * size,
                 ),
             ],
         ],

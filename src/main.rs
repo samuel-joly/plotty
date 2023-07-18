@@ -1,6 +1,6 @@
 mod demos;
 mod scene;
-use demos::cube;
+use demos::rotating_cube;
 use scene::Scene;
 
 use std::num::NonZeroU32;
@@ -20,7 +20,7 @@ fn main() {
     let context = unsafe { softbuffer::Context::new(&window) }.unwrap();
     let mut surface = unsafe { softbuffer::Surface::new(&context, &window) }.unwrap();
 
-    let mut scene:Scene = Scene{
+    let mut scene: Scene = Scene {
         camera: (0.0, 0.0, 0.0),
         screen: (0.0, 0.0, 1.0),
         width,
@@ -54,9 +54,9 @@ fn main() {
                 let mut buffer = surface.buffer_mut().unwrap();
                 buffer.fill(0x000000);
 
-                for faces in cube(frame) {
+                for faces in rotating_cube((-1.0, -1.0, 2.0), 0.25, frame) {
                     for tr in faces {
-                        let triangle = scene.project_and_scale(tr);
+                        let triangle = scene.project(tr);
                         scene.draw_triangle(triangle, &mut buffer);
                     }
                 }

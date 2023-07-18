@@ -8,28 +8,7 @@ pub struct Scene {
 }
 
 impl Scene {
-    pub fn scale(&self, x: f64, y: f64) -> (f64, f64) {
-        (
-            (((x + 1.0) / 2.0) * self.width as f64),
-            ((1.0 - (y + 1.0) / 2.0) * self.height as f64),
-        )
-    }
-
     pub fn project(&self, points: Vec<(f64, f64, f64)>) -> Vec<(f64, f64)> {
-        let mut projection: Vec<(f64, f64)> = vec![];
-        for point in points {
-            let x = ((point.0 - self.camera.0) * (self.screen.2 - self.camera.2)
-                / (point.2 - self.camera.2))
-                + self.camera.0;
-            let y = ((point.1 - self.camera.1) * (self.screen.2 - self.camera.2)
-                / (point.2 - self.camera.2))
-                + self.camera.1;
-            projection.push((x, y));
-        }
-        projection
-    }
-
-    pub fn project_and_scale(&self, points: Vec<(f64, f64, f64)>) -> Vec<(f64, f64)> {
         let mut projection: Vec<(f64, f64)> = vec![];
         for point in points {
             let mut x = ((point.0 - self.camera.0) * (self.screen.2 - self.camera.2)
@@ -39,11 +18,17 @@ impl Scene {
                 / (point.2 - self.camera.2))
                 + self.camera.1;
 
-            x = ((x + 1.0) / 2.0) * self.width as f64;
-            y = (1.0 - (y + 1.0) / 2.0) * self.height as f64;
+            (x, y) = self.scale(x, y);
             projection.push((x, y));
         }
         projection
+    }
+
+    pub fn scale(&self, x: f64, y: f64) -> (f64, f64) {
+        (
+            (((x + 1.0) / 2.0) * self.width as f64),
+            ((1.0 - (y + 1.0) / 2.0) * self.height as f64),
+        )
     }
 
     pub fn draw_triangle(&self, triangle: Vec<(f64, f64)>, buffer: &mut Buffer) {
