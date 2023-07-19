@@ -53,11 +53,21 @@ fn main() {
             Event::RedrawRequested(window_id) if window_id == window.id() => {
                 let mut buffer = surface.buffer_mut().unwrap();
                 buffer.fill(0x000000);
-
-                for faces in rotating_cube((-1.0, -1.0, 2.0), 0.25, frame) {
+                for faces in demos::cube((0.6, 0.0, 0.75), 0.1) {
                     for tr in faces {
-                        let triangle = scene.project(tr);
-                        scene.draw_triangle(triangle, &mut buffer);
+                        let triangle = scene.project(tr, true);
+                        if triangle.len() > 0 {
+                            scene.draw_triangle(triangle, &mut buffer);
+                        }
+                    }
+                }
+
+                for faces in rotating_cube((0.0, -1.0, 2.0), 1.0, frame) {
+                    for tr in faces {
+                        let triangle = scene.project(tr, true);
+                        if triangle.len() > 0 {
+                            scene.draw_triangle(triangle, &mut buffer);
+                        }
                     }
                 }
                 buffer.present().unwrap();
