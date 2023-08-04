@@ -10,10 +10,15 @@ pub struct Scene {
 impl Scene {
     pub fn project(&self, points: Vec<(f64, f64, f64)>, normalize: bool) -> Vec<(f64, f64)> {
         let mut projection: Vec<(f64, f64)> = vec![];
-        let normal = self.normal_triangle(&points);
-        let dot_prod = (points[0].0 - self.camera.0) * normal.0
-            + (points[0].1 - self.camera.1) * normal.1
-            + (points[0].2 - self.camera.2) * normal.2;
+        let dot_prod;
+        if points.len() > 2 {
+            let normal = self.normal_triangle(&points);
+            dot_prod = (points[0].0 - self.camera.0) * normal.0
+                + (points[0].1 - self.camera.1) * normal.1
+                + (points[0].2 - self.camera.2) * normal.2;
+        } else {
+            dot_prod = -1.0;
+        }
         if dot_prod < 0.0 || !normalize == true {
             for point in points {
                 let mut x = ((point.0 - self.camera.0) * (self.screen.2 - self.camera.2)
