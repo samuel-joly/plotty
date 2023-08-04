@@ -10,11 +10,16 @@ pub struct Scene {
 impl Scene {
     pub fn project(&self, points: Vec<(f64, f64, f64)>, normalize: bool) -> Vec<(f64, f64)> {
         let mut projection: Vec<(f64, f64)> = vec![];
-        let normal = self.normal_triangle(&points);
-        let dot_prod = (points[0].0 - self.camera.0) * normal.0
-            + (points[0].1 - self.camera.1) * normal.1
-            + (points[0].2 - self.camera.2) * normal.2;
-        if dot_prod < 0.0 || !normalize == true {
+        let dot_prod;
+        if points.len() == 3 {
+            let normal = self.normal_triangle(&points);
+            dot_prod = (points[0].0 - self.camera.0) * normal.0
+                + (points[0].1 - self.camera.1) * normal.1
+                + (points[0].2 - self.camera.2) * normal.2;
+        } else {
+            dot_prod = 0.0;
+        }
+        if dot_prod < 0.0 || normalize == false {
             for point in points {
                 let mut x = ((point.0 - self.camera.0) * (self.screen.2 - self.camera.2)
                     / (point.2 - self.camera.2))
@@ -37,9 +42,7 @@ impl Scene {
         )
     }
 
-    pub fn draw_triangle(&self, triangle: Vec<(f64, f64)>, buffer: &mut Buffer) {
-        let _colors = vec![0xFF0000, 0x00FF00, 0x0000FF];
-
+    pub fn draw_triangle(&self, triangle: Vec<(f64, f64)>, buffer: &mut Buffer, color: u32) {
         let dist_x_ab: f64 = triangle[1].0 - triangle[0].0;
         let dist_y_ab: f64 = triangle[1].1 - triangle[0].1;
 
@@ -55,16 +58,30 @@ impl Scene {
             (dist_x_ac, dist_y_ac, triangle[0]),
         ];
 
-        for (_cnt, (dist_x, dist_y, triangle)) in dists.into_iter().enumerate() {
+        for (dist_x, dist_y, triangle) in &dists {
             let total_dist = dist_x.abs() + dist_y.abs();
             for j in 0..total_dist.floor() as i32 {
                 let x = triangle.0 + dist_x * j as f64 / total_dist;
                 let y = triangle.1 + dist_y * j as f64 / total_dist;
                 let index = x.floor() as i32 + (y.floor() as i32 * self.width as i32);
                 if buffer.get(index as usize).is_some() {
-                    buffer[index as usize] = 0xFFFFFF;
-                    //buffer[index as usize] = colors[_cnt as usize];
+                    buffer[index as usize] = color;
                 }
+            }
+        }
+    }
+
+    pub fn draw_line(&self, start: (f64, f64), end: (f64, f64), buffer: &mut Buffer, color: u32) {
+        let dist_x = end.0 - start.0;
+        let dist_y = end.1 - start.1;
+        let total_dist = dist_x.abs() + dist_y.abs();
+        dbg!(start, end, dist_x, dist_y, total_dist);
+        for j in 0..total_dist.floor() as i32 {
+            let x = start.0 + dist_x * j as f64 / total_dist;
+            let y = start.1 + dist_y * j as f64 / total_dist;
+            let index = x.floor() as i32 + (y.floor() as i32 * self.width as i32);
+            if buffer.get(index as usize).is_some() {
+                buffer[index as usize] = color;
             }
         }
     }

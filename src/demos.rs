@@ -134,18 +134,18 @@ pub fn cube(pos: (f64, f64, f64), size: f64) -> Vec<Vec<Vec<(f64, f64, f64)>>> {
                 (pos.0 + size, pos.1 - size, pos.2),
             ],
         ],
-         vec![
-             vec![
-                 (pos.0 - size, pos.1 + size, pos.2),
-                 (pos.0 - size, pos.1 - size, pos.2),
-                 (pos.0 + size, pos.1 + size, pos.2),
-             ],
-             vec![
-                 (pos.0 - size, pos.1 - size, pos.2),
-                 (pos.0 + size, pos.1 - size, pos.2),
-                 (pos.0 + size, pos.1 + size, pos.2),
-             ],
-         ],
+        vec![
+            vec![
+                (pos.0 - size, pos.1 + size, pos.2),
+                (pos.0 - size, pos.1 - size, pos.2),
+                (pos.0 + size, pos.1 + size, pos.2),
+            ],
+            vec![
+                (pos.0 - size, pos.1 - size, pos.2),
+                (pos.0 + size, pos.1 - size, pos.2),
+                (pos.0 + size, pos.1 + size, pos.2),
+            ],
+        ],
         vec![
             vec![
                 (pos.0 - size, pos.1 - size, pos.2 + size),
@@ -158,41 +158,41 @@ pub fn cube(pos: (f64, f64, f64), size: f64) -> Vec<Vec<Vec<(f64, f64, f64)>>> {
                 (pos.0 - size, pos.1 - size, pos.2 + size),
             ],
         ],
-         vec![
-             vec![
-                 (pos.0 - size, pos.1 + size, pos.2),
-                 (pos.0 - size, pos.1 - size, pos.2),
-                 (pos.0 - size, pos.1 + size, pos.2 + size),
-             ],
-             vec![
-                 (pos.0 - size, pos.1 - size, pos.2),
-                 (pos.0 - size, pos.1 - size, pos.2 + size),
-                 (pos.0 - size, pos.1 + size, pos.2 + size),
-             ],
-         ],
-          vec![
-              vec![
-                  (pos.0 + size, pos.1 + size, pos.2),
-                  (pos.0 + size, pos.1 + size, pos.2 + size),
-                  (pos.0 - size, pos.1 + size, pos.2),
-              ],
-              vec![
-                  (pos.0 - size, pos.1 + size, pos.2),
-                  (pos.0 - size, pos.1 + size, pos.2 + size),
-                  (pos.0 + size, pos.1 + size, pos.2 + size),
-              ],
-          ],
-         vec![
-             vec![
-                 (pos.0 - size, pos.1 - size, pos.2),
-                 (pos.0 + size, pos.1 - size, pos.2),
-                 (pos.0 - size, pos.1 - size, pos.2 + size),
-             ],
-             vec![
-                 (pos.0 + size, pos.1 - size, pos.2 + size),
-                 (pos.0 - size, pos.1 - size, pos.2),
-                 (pos.0 + size, pos.1 - size, pos.2),
-             ],
-         ],
+        vec![
+            vec![
+                (pos.0 - size, pos.1 + size, pos.2),
+                (pos.0 - size, pos.1 - size, pos.2),
+                (pos.0 - size, pos.1 + size, pos.2 + size),
+            ],
+            vec![
+                (pos.0 - size, pos.1 - size, pos.2),
+                (pos.0 - size, pos.1 - size, pos.2 + size),
+                (pos.0 - size, pos.1 + size, pos.2 + size),
+            ],
+        ],
+        vec![
+            vec![
+                (pos.0 + size, pos.1 + size, pos.2),
+                (pos.0 + size, pos.1 + size, pos.2 + size),
+                (pos.0 - size, pos.1 + size, pos.2),
+            ],
+            vec![
+                (pos.0 - size, pos.1 + size, pos.2),
+                (pos.0 - size, pos.1 + size, pos.2 + size),
+                (pos.0 + size, pos.1 + size, pos.2 + size),
+            ],
+        ],
+        vec![
+            vec![
+                (pos.0 - size, pos.1 - size, pos.2),
+                (pos.0 + size, pos.1 - size, pos.2),
+                (pos.0 - size, pos.1 - size, pos.2 + size),
+            ],
+            vec![
+                (pos.0 + size, pos.1 - size, pos.2 + size),
+                (pos.0 - size, pos.1 - size, pos.2),
+                (pos.0 + size, pos.1 - size, pos.2),
+            ],
+        ],
     ]
 }
