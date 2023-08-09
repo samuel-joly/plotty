@@ -1,3 +1,6 @@
+use std::collections::HashMap;
+
+use ab_glyph::{Font, FontRef, Glyph};
 use softbuffer::Buffer;
 
 pub struct Scene {
@@ -5,9 +8,33 @@ pub struct Scene {
     pub screen: (f64, f64, f64),
     pub width: u32,
     pub height: u32,
+    pub scale: f64,
+    pub font: HashMap<char, Vec<(u32, u32, u32)>>,
 }
 
 impl Scene {
+    pub fn new(
+        scale: f64,
+        camera: (f64, f64, f64),
+        screen: (f64, f64, f64),
+        width: u32,
+        height: u32,
+    ) -> Scene {
+        let font_ref = FontRef::try_from_slice(include_bytes!(
+            "/home/azefortwo/.local/share/fonts/LibreBaskerville-Italic.otf"
+        ))
+        .unwrap();
+
+        Scene {
+            camera,
+            screen,
+            width,
+            height,
+            scale,
+            font: Scene::compile_font(font_ref, 17.0),
+        }
+    }
+
     pub fn project(&self, points: Vec<(f64, f64, f64)>, normalize: bool) -> Vec<(f64, f64)> {
         let mut projection: Vec<(f64, f64)> = vec![];
         let dot_prod;
@@ -17,7 +44,7 @@ impl Scene {
                 + (points[0].1 - self.camera.1) * normal.1
                 + (points[0].2 - self.camera.2) * normal.2;
         } else {
-            dot_prod = -1.0;
+            dot_prod = 1.0;
         }
         if dot_prod < 0.0 || !normalize == true {
             for point in points {
@@ -37,13 +64,16 @@ impl Scene {
 
     pub fn scale(&self, x: f64, y: f64) -> (f64, f64) {
         (
-            (((x + 1.0) / 2.0) * self.width as f64),
-            ((1.0 - (y + 1.0) / 2.0) * self.height as f64),
+            (((x + self.scale) / (2.0 * self.scale)) * self.width as f64),
+            ((1.0 - (y + self.scale) / (2.0 * self.scale)) * self.height as f64),
         )
     }
 
     pub fn draw_triangle(&self, triangle: Vec<(f64, f64)>, buffer: &mut Buffer) {
         let _colors = vec![0xFF0000, 0x00FF00, 0x0000FF];
+        if triangle.len() < 2 {
+            return;
+        }
 
         let dist_x_ab: f64 = triangle[1].0 - triangle[0].0;
         let dist_y_ab: f64 = triangle[1].1 - triangle[0].1;
@@ -88,5 +118,65 @@ impl Scene {
         let normal_z = x_ab * y_ac - y_ab * x_ac;
 
         (normal_x, normal_y, normal_z)
+    }
+
+    pub fn draw_circle(
+        &self,
+        start_x: f64,
+        start_y: f64,
+        start_z: f64,
+        radius: f64,
+        color: u32,
+        buffer: &mut Buffer,
+    ) {
+        for i in 0..628 {
+            let x = ((i as f64 / 100.0).cos() * radius) + start_x;
+            let y = ((i as f64 / 100.0).sin() * radius) + start_y;
+
+            let (proj_x, proj_y) = self.project(vec![(x, y, start_z)], false)[0];
+            let index = proj_x.floor() as i32 + (proj_y.floor() as i32 * self.width as i32);
+            buffer[index as usize] = color;
+        }
+    }
+
+    pub fn draw_text(&self, text: &str, x_start: f64, y_start: f64, buffer: &mut Buffer) {
+        for letter in text.chars() {
+            for pix in &self.font[&letter] {
+                let x = pix.0 as f64 + x_start;
+                let y = pix.1 as f64 + y_start;
+                let (mut proj_x, mut proj_y) =
+                    self.project(vec![(x, y, self.camera.2 + 1.0)], false)[0];
+                (proj_x, proj_y) = self.scale(proj_x, proj_y);
+                let index = proj_x.floor() as i32 + (proj_y.floor() as i32 * self.width as i32);
+                dbg!(x, y, proj_x, proj_y, index);
+                buffer[index as usize] = pix.2;
+            }
+        }
+    }
+
+    pub fn compile_font(font: FontRef, fontsize: f32) -> HashMap<char, Vec<(u32, u32, u32)>> {
+        let str =
+            String::from("1234567890abcdefghijklmnopqrstuvwxyz,-:.ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        let mut symbols: HashMap<char, Vec<(u32, u32, u32)>> = HashMap::new();
+        for s in str.chars() {
+            let mut ret: Vec<(u32, u32, u32)> = vec![];
+            let q_glyph: Glyph = font.glyph_id(s).with_scale(fontsize);
+
+            if let Some(q) = font.outline_glyph(q_glyph) {
+                q.draw(|x, mut y, c| {
+                    if s == ',' || s == '.' {
+                        y += 10;
+                    }
+                    if s == '-' {
+                        y += 5;
+                    }
+                    let red = (255.0 * c).floor() as u32;
+                    let color = red | (red << 8) | (red << 16);
+                    ret.push((x, y, color));
+                });
+                symbols.insert(s, ret);
+            }
+        }
+        symbols
     }
 }
