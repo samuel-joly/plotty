@@ -10,6 +10,7 @@ pub struct Scene {
     pub height: u32,
     pub scale: f64,
     pub font: HashMap<char, Vec<(u32, u32, u32)>>,
+    pub fontsize: f32,
 }
 
 impl Scene {
@@ -19,9 +20,14 @@ impl Scene {
         screen: (f64, f64, f64),
         width: u32,
         height: u32,
+        fontsize: f32,
     ) -> Scene {
         let font_ref = FontRef::try_from_slice(include_bytes!(
-            "/home/azefortwo/.local/share/fonts/LibreBaskerville-Italic.otf"
+            //"/home/azefortwo/Code/rust/plotty/Minecraft.ttf",
+            // "/home/azefortwo/Code/rust/plotty/rainyhearts.ttf",
+            //"/home/azefortwo/Code/rust/plotty/DePixelKlein.ttf",
+            "/home/azefortwo/Code/rust/plotty/Anonymous.ttf",
+            // "/home/azefortwo/Code/rust/plotty/DePixelBreit.ttf",
         ))
         .unwrap();
 
@@ -31,7 +37,8 @@ impl Scene {
             width,
             height,
             scale,
-            font: Scene::compile_font(font_ref, 17.0),
+            font: Scene::compile_font(font_ref, fontsize),
+            fontsize,
         }
     }
 
@@ -69,6 +76,31 @@ impl Scene {
         )
     }
 
+    pub fn proj_no_scale(&self, points: Vec<(f64, f64, f64)>, normalize: bool) -> Vec<(f64, f64)> {
+        let mut projection: Vec<(f64, f64)> = vec![];
+        let dot_prod;
+        if points.len() > 2 {
+            let normal = self.normal_triangle(&points);
+            dot_prod = (points[0].0 - self.camera.0) * normal.0
+                + (points[0].1 - self.camera.1) * normal.1
+                + (points[0].2 - self.camera.2) * normal.2;
+        } else {
+            dot_prod = 1.0;
+        }
+        if dot_prod < 0.0 || !normalize == true {
+            for point in points {
+                let x = ((point.0 - self.camera.0) * (self.screen.2 - self.camera.2)
+                    / (point.2 - self.camera.2))
+                    + self.camera.0;
+                let y = ((point.1 - self.camera.1) * (self.screen.2 - self.camera.2)
+                    / (point.2 - self.camera.2))
+                    + self.camera.1;
+
+                projection.push((x, y));
+            }
+        }
+        projection
+    }
     pub fn draw_triangle(&self, triangle: Vec<(f64, f64)>, buffer: &mut Buffer) {
         let _colors = vec![0xFF0000, 0x00FF00, 0x0000FF];
         if triangle.len() < 2 {
@@ -139,39 +171,39 @@ impl Scene {
         }
     }
 
-    pub fn draw_text(&self, text: &str, x_start: f64, y_start: f64, buffer: &mut Buffer) {
-        for letter in text.chars() {
-            for pix in &self.font[&letter] {
-                let x = pix.0 as f64 + x_start;
-                let y = pix.1 as f64 + y_start;
-                let (mut proj_x, mut proj_y) =
-                    self.project(vec![(x, y, self.camera.2 + 1.0)], false)[0];
-                (proj_x, proj_y) = self.scale(proj_x, proj_y);
-                let index = proj_x.floor() as i32 + (proj_y.floor() as i32 * self.width as i32);
-                dbg!(x, y, proj_x, proj_y, index);
-                buffer[index as usize] = pix.2;
+    pub fn draw_text(&self, text: &str, pos: (f64, f64), buffer: &mut Buffer) {
+        for (index, letter) in text.chars().enumerate() {
+            if letter != ' ' {
+                for pix in &self.font[&letter] {
+                    let x = pix.0 as f64 + pos.0;
+                    let y = pix.1 as f64 - pos.1;
+                    let index = (index as i32 * ((self.fontsize.floor()) * 0.7) as i32)
+                        + (self.width / 2) as i32
+                        + ((self.width * self.height) / 2) as i32
+                        + x.floor() as i32
+                        + (y.floor() as i32 * self.width as i32);
+                    buffer[index as usize] = pix.2;
+                }
             }
         }
     }
 
     pub fn compile_font(font: FontRef, fontsize: f32) -> HashMap<char, Vec<(u32, u32, u32)>> {
-        let str =
-            String::from("1234567890abcdefghijklmnopqrstuvwxyz,-:.ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        let str = String::from(
+            "1234567890bdfghijklacemnopqrstuvwxyz,-:.ABCDEFGHIJKLMNOPQRSTUVWXYZ %*/<>?!+\"\'",
+        );
         let mut symbols: HashMap<char, Vec<(u32, u32, u32)>> = HashMap::new();
         for s in str.chars() {
             let mut ret: Vec<(u32, u32, u32)> = vec![];
-            let q_glyph: Glyph = font.glyph_id(s).with_scale(fontsize);
+            let ab_glyph: Glyph = font.glyph_id(s).with_scale(fontsize);
 
-            if let Some(q) = font.outline_glyph(q_glyph) {
-                q.draw(|x, mut y, c| {
-                    if s == ',' || s == '.' {
-                        y += 10;
+            if let Some(glyph) = font.outline_glyph(ab_glyph) {
+                glyph.draw(|x, mut y, c| {
+                    if "giacemnopqrsuvwxyz".contains(s) {
+                        y += ((fontsize / 4.25).floor()) as u32;
                     }
-                    if s == '-' {
-                        y += 5;
-                    }
-                    let red = (255.0 * c).floor() as u32;
-                    let color = red | (red << 8) | (red << 16);
+                    let gradient = (255.0 * c).floor() as u32;
+                    let color = gradient | (gradient << 8) | (gradient << 16);
                     ret.push((x, y, color));
                 });
                 symbols.insert(s, ret);

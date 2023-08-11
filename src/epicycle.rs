@@ -2,8 +2,9 @@ use crate::scene::Scene;
 use softbuffer::Buffer;
 
 pub fn draw_epicycle(buffer: &mut Buffer, scene: &Scene, frame: f64) {
-    let screen_z = 8.5;
-    let main_orbit: f64 = 8.0;
+    let screen_z = 101.0;
+    let main_orbit = 50.5;
+    let main_pos = (0.0, 0.0, screen_z);
     let epicycle: f64 = main_orbit / 5.0;
     let planet: f64 = main_orbit / 50.0;
     let planet_speed: f64 = 5.0;
@@ -16,19 +17,20 @@ pub fn draw_epicycle(buffer: &mut Buffer, scene: &Scene, frame: f64) {
         buffer[index_trajectory as usize] = 0x0000FF;
     }
 
-    buffer.fill(0x000000);
-    scene.draw_circle(10.0, 10.0, screen_z, main_orbit, 0xFFFFFF, buffer);
     scene.draw_circle(
-        epicycle_x + 10.0,
-        epicycle_y + 10.0,
+        main_pos.0, main_pos.1, screen_z, main_orbit, 0xFFFFFF, buffer,
+    );
+    scene.draw_circle(
+        epicycle_x + main_pos.0,
+        epicycle_y + main_pos.1,
         screen_z,
         planet,
         0x00FF00,
         buffer,
     );
     scene.draw_circle(
-        ((frame).cos() * main_orbit) + 10.0,
-        ((frame).sin() * main_orbit) + 10.0,
+        ((frame).cos() * main_orbit) + main_pos.0,
+        ((frame).sin() * main_orbit) + main_pos.1,
         screen_z,
         epicycle,
         0xFF0000,

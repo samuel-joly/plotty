@@ -5,12 +5,16 @@ use std::{
     time::{self, Instant},
 };
 
+use softbuffer::Buffer;
+
+use crate::scene::Scene;
+
 pub struct Frame {
     pub counter: u32,
     pub timer: Instant,
     pub delta_time: u32,
     pub attributes: Vec<u32>,
-    pub times: HashMap<u32, u32>,
+    pub times: Vec<f64>,
 }
 
 impl Frame {
@@ -20,19 +24,24 @@ impl Frame {
             timer: Instant::now(),
             delta_time,
             attributes: vec![],
-            times: HashMap::new(),
+            times: vec![],
         };
-        // Last self time
+        // Last update time
         fr.attributes.push(0);
-        // Mean of self time elapsed
-        fr.attributes.push(1);
+        // Avg fps
+        fr.attributes.push(0);
         fr
     }
 
     pub fn update(&mut self) {
         let duration_since_last_call = self.timer.elapsed().as_millis() as u32 - self.attributes[0];
-        self.attributes[1] += duration_since_last_call;
         self.attributes[0] = self.timer.elapsed().as_millis() as u32;
+        if self.counter % 100 == 0{
+            self.times.push(self.attributes[1] as f64/100.0);
+            self.attributes[1] = 0;
+        } else {
+            self.attributes[1] += duration_since_last_call;
+        }
         if self.delta_time > duration_since_last_call {
             std::thread::sleep(std::time::Duration::from_millis(
                 (self.delta_time - duration_since_last_call) as u64,
@@ -40,18 +49,18 @@ impl Frame {
         }
     }
 
-    pub fn speed_info(&mut self) {
-        let mut duration_since_last_update =
-            self.timer.elapsed().as_millis() as u32 - self.attributes[0];
+    pub fn speed_info(&mut self, buffer: &mut Buffer, scene: &Scene) {
+        let dur = self.times[((self.counter-1)/100) as usize];
+        let mut fps = String::new();
 
-        duration_since_last_update += 1;
-        print!(
-            "\r{:?}: {:?}ms {:?}fps {:?}fps",
-            self.counter,
-            duration_since_last_update,
-            (1000 / duration_since_last_update), // Theoritical fps
-            1000 / (self.attributes[1] / self.counter), // Mean fps Weird result
+        fps.push_str(&((dur*10.0).floor() as u32).to_string());
+        fps.push_str("fps");
+
+        let (x, y) = scene.scale(
+            (2.0 * scene.scale) - (scene.fontsize * 0.2) as f64 * fps.len() as f64,
+            2.0 * scene.scale - scene.fontsize as f64 * 0.5,
         );
-        let _ = std::io::stdout().flush();
+
+        scene.draw_text(&fps, (x, y), buffer);
     }
 }
