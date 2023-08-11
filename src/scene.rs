@@ -152,20 +152,12 @@ impl Scene {
         (normal_x, normal_y, normal_z)
     }
 
-    pub fn draw_circle(
-        &self,
-        start_x: f64,
-        start_y: f64,
-        start_z: f64,
-        radius: f64,
-        color: u32,
-        buffer: &mut Buffer,
-    ) {
+    pub fn draw_circle(&self, pos: (f64, f64, f64), radius: f64, color: u32, buffer: &mut Buffer) {
         for i in 0..628 {
-            let x = ((i as f64 / 100.0).cos() * radius) + start_x;
-            let y = ((i as f64 / 100.0).sin() * radius) + start_y;
+            let x = ((i as f64 / 100.0).cos() * radius) + pos.0;
+            let y = ((i as f64 / 100.0).sin() * radius) + pos.1;
 
-            let (proj_x, proj_y) = self.project(vec![(x, y, start_z)], false)[0];
+            let (proj_x, proj_y) = self.project(vec![(x, y, pos.2)], false)[0];
             let index = proj_x.floor() as i32 + (proj_y.floor() as i32 * self.width as i32);
             buffer[index as usize] = color;
         }

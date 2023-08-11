@@ -59,9 +59,21 @@ fn main() {
                 buffer.fill(0x000000);
                 frame.update();
                 frame.counter += 1;
-                demos::draw_rotating_cube((10.0,10.0,101.0), 10.0, &mut buffer, &scene, frame.counter);
+                demos::draw_rotating_cube(
+                    (-50.0, 40.0, 101.0),
+                    10.0,
+                    &mut buffer,
+                    &scene,
+                    frame.counter,
+                );
 
-                draw_epicycle(&mut buffer, &scene, frame.counter as f64 / 50.0);
+                draw_epicycle(
+                    (50.0, 50.0, 101.0),
+                    20.5,
+                    &mut buffer,
+                    &scene,
+                    frame.counter as f64 / 50.0,
+                );
                 frame.speed_info(&mut buffer, &scene);
                 buffer.present().unwrap();
             }

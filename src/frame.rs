@@ -36,8 +36,8 @@ impl Frame {
     pub fn update(&mut self) {
         let duration_since_last_call = self.timer.elapsed().as_millis() as u32 - self.attributes[0];
         self.attributes[0] = self.timer.elapsed().as_millis() as u32;
-        if self.counter % 100 == 0{
-            self.times.push(self.attributes[1] as f64/100.0);
+        if self.counter % 100 == 0 {
+            self.times.push(self.attributes[1] as f64 / 100.0);
             self.attributes[1] = 0;
         } else {
             self.attributes[1] += duration_since_last_call;
@@ -50,10 +50,10 @@ impl Frame {
     }
 
     pub fn speed_info(&mut self, buffer: &mut Buffer, scene: &Scene) {
-        let dur = self.times[((self.counter-1)/100) as usize];
+        let dur = self.times[((self.counter - 1) / 100) as usize];
         let mut fps = String::new();
 
-        fps.push_str(&((dur*10.0).floor() as u32).to_string());
+        fps.push_str(&((1000.0 / dur).floor() as u32).to_string());
         fps.push_str("fps");
 
         let (x, y) = scene.scale(
