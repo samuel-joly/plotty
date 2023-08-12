@@ -13,22 +13,23 @@ use winit::window::WindowBuilder;
 
 fn main() {
     let event_loop = EventLoop::new();
-    let mut width = 600;
-    let mut height = 600;
+    let mut _width = 600;
+    let mut _height = 600;
     let window_builder = WindowBuilder::new()
         .with_title("plotty")
-        .with_inner_size(LogicalSize::new(width, height));
+        .with_inner_size(LogicalSize::new(_width, _height));
     let window = window_builder.build(&event_loop).unwrap();
     let context = unsafe { softbuffer::Context::new(&window) }.unwrap();
     let mut surface = unsafe { softbuffer::Surface::new(&context, &window) }.unwrap();
 
+    let mut memory:Vec<u32> = vec![0];
     let mut frame = Frame::new(15);
     let mut scene: Scene = Scene::new(
         100.0,
         (0.0, 0.0, 0.0),
         (0.0, 0.0, 100.0),
-        width,
-        height,
+        _width,
+        _height,
         18.0,
     );
 
@@ -40,18 +41,18 @@ fn main() {
                 event: WindowEvent::Resized(..),
                 ..
             } => {
-                (width, height) = {
+                (_width, _height) = {
                     let size = window.inner_size();
                     (size.width, size.height)
                 };
                 surface
                     .resize(
-                        NonZeroU32::new(width).unwrap(),
-                        NonZeroU32::new(height).unwrap(),
+                        NonZeroU32::new(_width).unwrap(),
+                        NonZeroU32::new(_height).unwrap(),
                     )
                     .unwrap();
-                scene.width = width;
-                scene.height = height;
+                scene.width = _width;
+                scene.height = _height;
             }
 
             Event::MainEventsCleared => {
@@ -59,20 +60,15 @@ fn main() {
                 buffer.fill(0x000000);
                 frame.update();
                 frame.counter += 1;
-                demos::draw_rotating_cube(
-                    (-50.0, 40.0, 101.0),
-                    10.0,
-                    &mut buffer,
-                    &scene,
-                    frame.counter,
-                );
-
+                scene.draw_cube(demos::rotating_cube((-50.0, 40.0, 100.0), 20.0, frame.counter as f64 / 30.0), &mut buffer);
+                scene.draw_cube(demos::cube((-50.0, -40.0, 100.0), 15.0), &mut buffer);
                 draw_epicycle(
                     (50.0, 50.0, 101.0),
                     20.5,
                     &mut buffer,
                     &scene,
-                    frame.counter as f64 / 50.0,
+                    frame.counter as f64 / 30.0,
+                    &mut memory,
                 );
                 frame.speed_info(&mut buffer, &scene);
                 buffer.present().unwrap();

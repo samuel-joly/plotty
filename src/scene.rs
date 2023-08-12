@@ -23,11 +23,11 @@ impl Scene {
         fontsize: f32,
     ) -> Scene {
         let font_ref = FontRef::try_from_slice(include_bytes!(
-            //"/home/azefortwo/Code/rust/plotty/Minecraft.ttf",
-            // "/home/azefortwo/Code/rust/plotty/rainyhearts.ttf",
-            //"/home/azefortwo/Code/rust/plotty/DePixelKlein.ttf",
-            "/home/azefortwo/Code/rust/plotty/Anonymous.ttf",
-            // "/home/azefortwo/Code/rust/plotty/DePixelBreit.ttf",
+            //"/home/azefortwo/Code/rust/plotty/fonts/Minecraft.ttf",
+            // "/home/azefortwo/Code/rust/plotty/fonts/rainyhearts.ttf",
+            //"/home/azefortwo/Code/rust/plotty/fonts/DePixelKlein.ttf",
+            "/home/azefortwo/Code/rust/plotty/fonts/Anonymous.ttf",
+            // "/home/azefortwo/Code/rust/plotty/fonts/DePixelBreit.ttf",
         ))
         .unwrap();
 
@@ -76,31 +76,6 @@ impl Scene {
         )
     }
 
-    pub fn proj_no_scale(&self, points: Vec<(f64, f64, f64)>, normalize: bool) -> Vec<(f64, f64)> {
-        let mut projection: Vec<(f64, f64)> = vec![];
-        let dot_prod;
-        if points.len() > 2 {
-            let normal = self.normal_triangle(&points);
-            dot_prod = (points[0].0 - self.camera.0) * normal.0
-                + (points[0].1 - self.camera.1) * normal.1
-                + (points[0].2 - self.camera.2) * normal.2;
-        } else {
-            dot_prod = 1.0;
-        }
-        if dot_prod < 0.0 || !normalize == true {
-            for point in points {
-                let x = ((point.0 - self.camera.0) * (self.screen.2 - self.camera.2)
-                    / (point.2 - self.camera.2))
-                    + self.camera.0;
-                let y = ((point.1 - self.camera.1) * (self.screen.2 - self.camera.2)
-                    / (point.2 - self.camera.2))
-                    + self.camera.1;
-
-                projection.push((x, y));
-            }
-        }
-        projection
-    }
     pub fn draw_triangle(&self, triangle: Vec<(f64, f64)>, buffer: &mut Buffer) {
         let _colors = vec![0xFF0000, 0x00FF00, 0x0000FF];
         if triangle.len() < 2 {
@@ -150,6 +125,19 @@ impl Scene {
         let normal_z = x_ab * y_ac - y_ab * x_ac;
 
         (normal_x, normal_y, normal_z)
+    }
+
+    pub fn draw_cube(
+        &self,
+        cube: Vec<Vec<Vec<(f64, f64, f64)>>>,
+        buffer: &mut softbuffer::Buffer,
+    ) {
+        for face in cube {
+            for tr in face {
+                let triangle = self.project(tr, true);
+                self.draw_triangle(triangle, buffer);
+            }
+        }
     }
 
     pub fn draw_circle(&self, pos: (f64, f64, f64), radius: f64, color: u32, buffer: &mut Buffer) {
