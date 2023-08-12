@@ -127,11 +127,7 @@ impl Scene {
         (normal_x, normal_y, normal_z)
     }
 
-    pub fn draw_cube(
-        &self,
-        cube: Vec<Vec<Vec<(f64, f64, f64)>>>,
-        buffer: &mut softbuffer::Buffer,
-    ) {
+    pub fn draw_cube(&self, cube: Vec<Vec<Vec<(f64, f64, f64)>>>, buffer: &mut softbuffer::Buffer) {
         for face in cube {
             for tr in face {
                 let triangle = self.project(tr, true);
@@ -148,6 +144,19 @@ impl Scene {
             let (proj_x, proj_y) = self.project(vec![(x, y, pos.2)], false)[0];
             let index = proj_x.floor() as i32 + (proj_y.floor() as i32 * self.width as i32);
             buffer[index as usize] = color;
+        }
+    }
+
+    pub fn draw_line(&self, start: (f64, f64), end: (f64, f64), color: u32, buffer: &mut Buffer) {
+        let line_len = (end.0 - start.0, end.1 - start.1);
+        let abs_len = line_len.0.abs() + line_len.1.abs();
+        for i in 0..abs_len as usize {
+            let x = start.0 + line_len.0 * i as f64 / abs_len;
+            let y = start.1 + line_len.1 * i as f64 / abs_len;
+            let index = x.floor() as i32 + (y.floor() as i32 * self.width as i32);
+            if buffer.get(index as usize).is_some() {
+                buffer[index as usize] = color;
+            }
         }
     }
 

@@ -22,7 +22,7 @@ fn main() {
     let context = unsafe { softbuffer::Context::new(&window) }.unwrap();
     let mut surface = unsafe { softbuffer::Surface::new(&context, &window) }.unwrap();
 
-    let mut memory:Vec<u32> = vec![0];
+    let mut memory: Vec<(f64, f64)> = vec![];
     let mut frame = Frame::new(15);
     let mut scene: Scene = Scene::new(
         100.0,
@@ -60,14 +60,17 @@ fn main() {
                 buffer.fill(0x000000);
                 frame.update();
                 frame.counter += 1;
-                scene.draw_cube(demos::rotating_cube((-50.0, 40.0, 100.0), 20.0, frame.counter as f64 / 30.0), &mut buffer);
+                scene.draw_cube(
+                    demos::rotating_cube((-50.0, 40.0, 100.0), 20.0, frame.counter as f64 / 30.0),
+                    &mut buffer,
+                );
                 scene.draw_cube(demos::cube((-50.0, -40.0, 100.0), 15.0), &mut buffer);
                 draw_epicycle(
                     (50.0, 50.0, 101.0),
                     20.5,
                     &mut buffer,
                     &scene,
-                    frame.counter as f64 / 30.0,
+                    frame.counter,
                     &mut memory,
                 );
                 frame.speed_info(&mut buffer, &scene);
