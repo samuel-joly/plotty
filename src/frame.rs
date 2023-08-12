@@ -1,12 +1,5 @@
-use std::{
-    collections::HashMap,
-    io::Write,
-    thread,
-    time::{self, Instant},
-};
-
+use std::time::Instant;
 use softbuffer::Buffer;
-
 use crate::scene::Scene;
 
 pub struct Frame {
@@ -42,10 +35,10 @@ impl Frame {
         } else {
             self.attributes[1] += duration_since_last_call;
         }
-        if self.delta_time > duration_since_last_call {
-            std::thread::sleep(std::time::Duration::from_millis(
-                (self.delta_time - duration_since_last_call) as u64,
-            ));
+         if self.delta_time > duration_since_last_call {
+             std::thread::sleep(std::time::Duration::from_millis(
+                 (self.delta_time - duration_since_last_call) as u64,
+             ));
         }
     }
 
